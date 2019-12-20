@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Tree from "./components/AipCollapsibleTree";
 import initialData from "./components/CollapsibleTreeData.js";
 import initialRepositories from "./components/EventDrops.json";
-import EventDrops from "./components/EventDrops/index.js";
+import EventDrops from "./components/AipEventDrops";
 
 function App() {
   const panels = [{ name: "CollapsibleTree" }, { name: "EventDrops" }];
@@ -70,10 +70,7 @@ function App() {
           <button onClick={() => setActivePanel(panels[0].name)}>
             Перейти к CollapsibleTree
           </button>
-          <EventDrops
-            events={repositories}
-            style={{ width: window.outerWidth, height: window.outerHeight }}
-          />
+          <EventDrops events={repositories} width={600} height={400} />
         </div>
       )}
     </div>
