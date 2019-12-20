@@ -4,12 +4,15 @@ import Tree from "./components/AipCollapsibleTree";
 import initialData from "./components/CollapsibleTreeData.js";
 import initialRepositories from "./components/EventDrops.json";
 import EventDrops from "./components/AipEventDrops";
+import html2canvas from "html2canvas";
+import jimp from "jimp";
 
 function App() {
   const panels = [{ name: "CollapsibleTree" }, { name: "EventDrops" }];
   let [data, setData] = useState(initialData);
   let [repositories, setRepositories] = useState(initialRepositories);
   let [activePanel, setActivePanel] = useState(panels[0].name);
+  let [imageBlob, setImageBlob] = useState(null);
   useEffect(
     () =>
       setRepositories(repositories =>
@@ -19,8 +22,33 @@ function App() {
   );
   useEffect(() => console.log("edited data"), [data]);
   useEffect(() => console.log("edited repositories", [repositories]));
+  let take_screenshot = () =>
+    html2canvas(document.body).then(function(canvas) {
+      var myImage = canvas.toDataURL("image/png");
+      jimp.read(myImage).then(image => {
+        image.crop(
+          window.scrollX,
+          window.scrollY,
+          window.innerWidth,
+          window.innerHeight
+        );
+        image.getBufferAsync("image/png").then(buffer => {
+          let r = new Blob([new Uint8Array(buffer)], {
+            type: "image/png",
+            name: "image.png"
+          });
+          setImageBlob(r);
+          //setimageBlob(URL.createObjectURL(r));
+        });
+      });
+    });
   return (
     <div>
+      <center>
+        <button onClick={take_screenshot} style={{ position: "fixed" }}>
+          Сделать скриншот body
+        </button>
+      </center>
       {activePanel === panels[0].name && (
         <div>
           <button
@@ -71,6 +99,15 @@ function App() {
             Перейти к CollapsibleTree
           </button>
           <EventDrops events={repositories} width={600} height={400} />
+        </div>
+      )}
+      {!!imageBlob && (
+        <div>
+          Сделанный скриншот:{" "}
+          <a href={URL.createObjectURL(imageBlob)} download="image.png">
+            Открыть оригинал
+          </a>
+          <img src={URL.createObjectURL(imageBlob)} alt="Не поддерживается" />{" "}
         </div>
       )}
     </div>
